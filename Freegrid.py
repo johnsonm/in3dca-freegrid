@@ -45,6 +45,7 @@ import DraftVecUtils
 from in3dca import StorageGrid, StorageBox
 
 from PySide import QtCore, QtGui
+from PySide.QtCore import QT_TRANSLATE_NOOP
 
 try:
     _encoding = QtGui.QApplication.UnicodeUTF8
@@ -63,15 +64,14 @@ except AttributeError:
 
 
 class In3dGridUi(QtGui.QWidget):
-    def __init__(self):
-        super(In3dGridUi, self).__init__()
+    def __init__(self, MainWindow):
+        super(In3dGridUi, self).__init__(MainWindow)
+        self.window = MainWindow
+
         plus_int = QtGui.QIntValidator()
         plus_int.setBottom(1)
 
-        #self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-        self.setWindowTitle("In3D.ca FreeGrid Storage System")
-        self.setWindowModality(QtCore.Qt.ApplicationModal)
-        self.resize(350, 330)
+        self.resize(370, 350)
 
         # We have rows for: the tabs, the global options, the generate/close buttons, and a message
         # Start with the tabs
@@ -221,7 +221,7 @@ class In3dGridUi(QtGui.QWidget):
             self.box_ramp.setChecked(False)
 
     def close_button_click(self):
-        self.hide()
+        self.window.hide()
 
     def generate_box(self):
         # We are creating a box
@@ -300,4 +300,28 @@ class In3dGridUi(QtGui.QWidget):
         elif self.tabs.currentIndex() == 2:
             pass
 
-gui = In3dGridUi()
+class FreegridCommand:
+    def __init__(self):
+        pass
+
+    def GetResources(self):
+        return {
+            'Pixmap': '',
+            'MenuText': QT_TRANSLATE_NOOP('Freegrid', 'Freegrid'),
+            'ToolTip': QT_TRANSLATE_NOOP('Freegrid', 'Create Freegrid elements')
+        }
+
+    def Activated(self):
+        MainWindow = QtGui.QMainWindow()
+        MainWindow.setWindowTitle("In3D.ca FreeGrid Storage System")
+        MainWindow.setMinimumSize(QtCore.QSize(370, 350))
+        MainWindow.setMaximumSize(QtCore.QSize(370, 350))
+        MainWindow.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
+        MainWindow.setWindowModality(QtCore.Qt.ApplicationModal)
+        ui = In3dGridUi(MainWindow)
+        MainWindow.show()
+
+    def isActive(self):
+        return True
+
+FreeCADGui.addCommand('Freegrid', FreegridCommand())
